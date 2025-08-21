@@ -1,0 +1,13 @@
+
+[Unit]
+Description=EG Device Agent
+After=network-online.target
+Wants=network-online.target
+[Service]
+Type=simple
+EnvironmentFile=/etc/eg/eg.env
+ExecStart=/bin/bash -lc 'cd "$EG_PROJECT_DIR" && /usr/bin/python3 -m devices.${DEVICE_KIND}.agent'
+Restart=always
+RestartSec=2
+[Install]
+WantedBy=multi-user.target

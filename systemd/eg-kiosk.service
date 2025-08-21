@@ -1,0 +1,14 @@
+
+[Unit]
+Description=EG Kiosk Browser
+After=graphical.target eg-agent.service
+Wants=eg-agent.service
+[Service]
+Type=simple
+EnvironmentFile=/etc/eg/eg.env
+Environment=DISPLAY=:0
+ExecStart=/bin/bash -lc '"$EG_PROJECT_DIR/scripts/eg-kiosk.sh"'
+Restart=always
+RestartSec=2
+[Install]
+WantedBy=graphical.target

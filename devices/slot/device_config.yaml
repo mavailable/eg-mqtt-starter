@@ -1,0 +1,11 @@
+
+device_id: null
+use_mock_io: true
+pins:
+  buttons:
+    bet: 5
+    menu_prev: 6
+    menu_next: 13
+    menu_ok: 19
+  outputs:
+    lamp: 17

@@ -1,0 +1,6 @@
+PRAGMA journal_mode=WAL;
+PRAGMA synchronous=NORMAL;
+CREATE TABLE IF NOT EXISTS wallets (tag_uid TEXT PRIMARY KEY, balance_cents INTEGER NOT NULL DEFAULT 0, updated_at TEXT NOT NULL);
+CREATE TABLE IF NOT EXISTS payouts (payout_id TEXT PRIMARY KEY, source TEXT NOT NULL, amount_cents INTEGER NOT NULL, status TEXT NOT NULL, claimed_by_tag TEXT, meta TEXT, created_at TEXT NOT NULL, claimed_at TEXT);
+CREATE TABLE IF NOT EXISTS tx_log (id INTEGER PRIMARY KEY AUTOINCREMENT, ts TEXT NOT NULL, device_id TEXT NOT NULL, op TEXT NOT NULL, tag_uid TEXT, amount_cents INTEGER, details TEXT);
+CREATE TABLE IF NOT EXISTS kv (key TEXT PRIMARY KEY, value TEXT NOT NULL);

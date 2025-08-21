@@ -1,0 +1,8 @@
+
+paho-mqtt>=1.6.1
+PyYAML>=6.0.1
+# Optional on Raspberry Pi:
+# gpiozero
+# RPi.GPIO
+# spidev
+# mfrc522

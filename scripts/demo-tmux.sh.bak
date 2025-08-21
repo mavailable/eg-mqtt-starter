@@ -1,0 +1,37 @@
+#!/usr/bin/env bash
+set -euo pipefail
+SESSION="egdemo"
+PROJECT_DIR="${1:-$HOME/eg-mqtt-starter}"
+
+# venv minimal
+if [ ! -d "$PROJECT_DIR/.venv" ]; then
+  python3 -m venv "$PROJECT_DIR/.venv"
+  "$PROJECT_DIR/.venv/bin/pip" install --upgrade pip
+  if [ -f "$PROJECT_DIR/devices/requirements.txt" ]; then
+    "$PROJECT_DIR/.venv/bin/pip" install -r "$PROJECT_DIR/devices/requirements.txt"
+  else
+    "$PROJECT_DIR/.venv/bin/pip" install paho-mqtt PyYAML
+  fi
+fi
+
+# reset session
+tmux has-session -t "$SESSION" 2>/dev/null && tmux kill-session -t "$SESSION"
+tmux new-session -d -s "$SESSION" -n demo
+
+# Pane 1 : Core logs
+tmux send-keys -t "$SESSION":0.0 "cd '$PROJECT_DIR' && { [ -f docker-compose.yml ] && docker compose up -d && docker logs -f eg-core || echo 'Pas de docker-compose.yml -> pas de logs Core'; }" C-m
+# Pane 2 : Change
+tmux split-window -h -t "$SESSION":0
+tmux send-keys -t "$SESSION":0.1 "cd '$PROJECT_DIR' && source .venv/bin/activate && python -m devices.change.agent" C-m
+# Pane 3 : Roulette
+tmux split-window -v -t "$SESSION":0.0
+tmux send-keys -t "$SESSION":0.2 "cd '$PROJECT_DIR' && source .venv/bin/activate && python -m devices.roulette.agent" C-m
+# Pane 4 : Slot
+tmux split-window -v -t "$SESSION":0.1
+tmux send-keys -t "$SESSION":0.3 "cd '$PROJECT_DIR' && source .venv/bin/activate && python -m devices.slot.agent" C-m
+tmux select-layout -t "$SESSION":0 tiled
+
+# Fenêtre 2 : MQTT live
+tmux new-window -t "$SESSION" -n mqtt "mosquitto_sub -h 127.0.0.1 -t 'eg/#' -v"
+
+tmux attach -t "$SESSION"

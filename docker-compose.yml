@@ -1,0 +1,34 @@
+services:
+  mosquitto:
+    image: eclipse-mosquitto:2
+    container_name: eg-mosquitto
+    restart: unless-stopped
+    ports:
+      - "1883:1883"
+      - "9001:9001"
+    volumes:
+      - ./mosquitto/mosquitto.conf:/mosquitto/config/mosquitto.conf:ro
+      - mosquitto_data:/mosquitto/data
+      - mosquitto_log:/mosquitto/log
+
+  core:
+    build: ./core
+    container_name: eg-core
+    restart: unless-stopped
+    environment:
+      - BROKER_HOST=mosquitto
+      - BROKER_PORT=1883
+      - WS_PORT=9001
+      - MQTT_NAMESPACE=eg
+      - DB_PATH=/data/core.db
+    depends_on:
+      - mosquitto
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./core:/app
+      - ./data:/data
+
+volumes:
+  mosquitto_data:
+  mosquitto_log:
